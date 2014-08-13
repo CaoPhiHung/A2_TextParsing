@@ -2,8 +2,12 @@
 #include <string>
 #include <curl/curl.h>
 #include <fstream>
+#include "rapidjson/document.h"
+#include "rapidjson/writer.h"
+#include "rapidjson/stringbuffer.h"
 
 using namespace std;
+using namespace rapidjson;
 
 string data;
 
@@ -30,8 +34,17 @@ int main(void)
     		myfile.close();
   		}else{ cout << "Unable to open file"; }
 
-
-
+  		Document document;
+		if ( document.Parse<0>( data.c_str() ).HasParseError() ) {
+    		std::cout << "Error parsing" << std::endl;
+		} else {
+    		if ( document[ "characterData" ].IsObject() ) {
+        		rapidjson::StringBuffer sb;
+        		rapidjson::Writer<rapidjson::StringBuffer> writer( sb );
+        		document[ "characterData" ].Accept( writer );
+        		std::cout << sb.GetString() << std::endl;
+    		}
+		}
 	}else{
 		//if file not exist => connect to website and download infor
 		CURL *curl;
