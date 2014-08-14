@@ -61,9 +61,32 @@ void readFromTextFile()
 	if ( document.Parse<0>( data.c_str() ).HasParseError() ) {
     	cout << "Error parsing" << std::endl;
 	} else {
+
     	const Value& a = document["nodes"];
-    	assert(a.IsArray());
-    	a[SizeType(0)];
+	   	
+	   	if(a.IsArray()){
+	   		cout << "True\n";
+	   	}   
+        //on1 json object in array
+        for (SizeType i = 0; i < a.Size(); ++i)
+        {
+        	StringBuffer sb;
+        	Writer<rapidjson::StringBuffer> writer( sb );
+	        document[ "nodes" ][i].Accept( writer );
+	        //std::cout << sb.GetString() << std::endl;
+	        Document skill;
+	        if ( skill.Parse<0>( sb.GetString() ).HasParseError() ) {
+	    		cout << "Error parsing" << std::endl;
+			} else {
+				cout << skill["id"].GetInt() << " connect to ";
+				const Value& b = skill["out"];
+				 for (SizeType i = 0; i < b.Size(); ++i)
+        		{
+        			cout << b[i].GetInt() << " " <<"\n";
+        		}
+				
+			}
+		}
 	}
 }
 
