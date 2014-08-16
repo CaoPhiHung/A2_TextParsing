@@ -19,8 +19,13 @@ class Character : public Node
     int intel;
     vector<int> connectedNodes;
 public:
-    Character();
-    virtual ~Character();
+    //Character();
+    //virtual ~Character();
+    Character(char characterID,int nodeID,string name,int str,int dex,int intel,vector<int> connectedNodes);
+   	char getCharacterID();
+   	int getStr();
+   	int getDex();
+   	int getIntel();
 };
 
 #endif

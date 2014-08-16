@@ -12,11 +12,18 @@ class Node
     private:
     int nodeID;
     string name;
+    vector<string> skillsEffect;
     vector<int> connectedNodes;
 
-public:
-    Node();
-    virtual ~Node();
+	public:
+	//Node();
+    //virtual ~Node();
+	Node(int id, string name, vector<string> skillsEffect, vector<int> node);
+    int getNodeID();
+    string getName();
+    vector<string> getSkillsEffect();
+    vector<int> getConnectedNodes();
+
 };
 
 #endif

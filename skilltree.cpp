@@ -7,6 +7,8 @@ const char printMenuOption = 'M';
 const char shortestPathOption = 'P';
 const char quitOption = 'Q';
 
+vector<Node> nodesVector;
+
 //checking the user input 
 char SkillTree::checkInput()
 {
@@ -83,7 +85,12 @@ void SkillTree::executeSkillTree()
 		connectToWebsite();
 	}
 
-
+	assignData();
+	for (int i = 0; i < nodesVector.size(); ++i)
+	{
+		cout << nodesVector.at(i).getSkillsEffect().at(0) << "\n";
+	}
+	
 
 	char userInput;
 	cout << "\n\tWELLCOME TO THE SKILL TREE OPTIMIZATION PROGRAM\n\n";
@@ -132,74 +139,53 @@ void SkillTree::connectToWebsite()
 	myfile.close();
 }
 
-void SkillTree::AssignCharacterData()
+void SkillTree::assignData()
 {
 	Document document;
+
 	if ( document.Parse<0>( data.c_str() ).HasParseError() ) {
     	cout << "Error parsing" << std::endl;
 	} else {
 
-    	const Value& a = document["nodes"];
-	   	
-	   	if(a.IsArray()){
-	   		cout << "True\n";
-	   	}   
-        //on1 json object in array
-        for (SizeType i = 0; i < a.Size(); ++i)
+		const Value& node = document["nodes"];
+        for (SizeType i = 0; i < node.Size(); ++i)
         {
+        	
         	StringBuffer sb;
-        	Writer<rapidjson::StringBuffer> writer( sb );
+        	Writer<StringBuffer> writer( sb );
 	        document[ "nodes" ][i].Accept( writer );
-	        //std::cout << sb.GetString() << std::endl;
+	        
 	        Document skills;
+	        
 	        if ( skills.Parse<0>( sb.GetString() ).HasParseError() ) {
 	    		cout << "Error parsing" << std::endl;
 			} else {
-				cout << skills["id"].GetInt() << " connect to ";
-				const Value& b = skills["out"];
-				 for (SizeType i = 0; i < b.Size(); ++i)
+				vector<int> connectedNode;
+				vector<string> skillsEffect;
+			
+				//connected nodes
+				const Value& cnode = skills["out"];
+				for (SizeType i = 0; i < cnode.Size(); ++i)
         		{
-        			cout << b[i].GetInt() << " " <<"\n";
+        			connectedNode.push_back(cnode[i].GetInt());
         		}
-				
+
+        		if(cnode.Size() == 0){ connectedNode.push_back(0); };
+
+        		//skills effect
+				const Value& effect = skills["sd"];
+				for (SizeType i = 0; i < effect.Size(); ++i)
+        		{
+        			skillsEffect.push_back(effect[i].GetString());
+        		}
+
+        		if(effect.Size() == 0){ skillsEffect.push_back("No Effect"); };      		
+
+        		Node n = Node(skills["id"].GetInt(),skills["dn"].GetString(),skillsEffect,connectedNode);
+				nodesVector.push_back(n);
 			}
 		}
-	}
-}
-
-void SkillTree::AssignSkillsData()
-{
-	Document document;
-	if ( document.Parse<0>( data.c_str() ).HasParseError() ) {
-    	cout << "Error parsing" << std::endl;
-	} else {
-
-    	const Value& a = document["nodes"];
-	   	
-	   	if(a.IsArray()){
-	   		cout << "True\n";
-	   	}   
-        //on1 json object in array
-        for (SizeType i = 0; i < a.Size(); ++i)
-        {
-        	StringBuffer sb;
-        	Writer<rapidjson::StringBuffer> writer( sb );
-	        document[ "nodes" ][i].Accept( writer );
-	        //std::cout << sb.GetString() << std::endl;
-	        Document skills;
-	        if ( skills.Parse<0>( sb.GetString() ).HasParseError() ) {
-	    		cout << "Error parsing" << std::endl;
-			} else {
-				cout << skills["id"].GetInt() << " connect to ";
-				const Value& b = skills["out"];
-				 for (SizeType i = 0; i < b.Size(); ++i)
-        		{
-        			cout << b[i].GetInt() << " " <<"\n";
-        		}
-				
-			}
-		}
-	}
+	}	
 }
 
 void SkillTree::readFromTextFile()

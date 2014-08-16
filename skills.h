@@ -10,11 +10,14 @@ class Skills : public Node
     private:
     int nodeID;
     string name;
+    string skillsEffect;
     vector<int> connectedNodes;
 
 public:
-    Skills();
-    virtual ~Skills();
+    //Skills();
+    //virtual ~Skills();
+    Skills(int nodeID,string name,string skillsEffect,vector<int> connectedNodes);
+    string getSkillsEffect();
 };
 
 #endif

@@ -7,13 +7,10 @@
 #include "rapidjson/document.h"
 #include "rapidjson/writer.h"
 #include "rapidjson/stringbuffer.h"
+#include "node.h"
 
 using namespace std;
 using namespace rapidjson;
-
-#include "node.h"
-#include "skills.h"
-#include "character.h"
 
 class SkillTree
 {
@@ -22,8 +19,7 @@ class SkillTree
 	public:
 	//SkillTree(arguments);
 	//~SkillTree();
-	void AssignSkillsData();
-	void AssignCharacterData();
+	void assignData();
 	char checkInput();
 	void switchOption(char);
 	void printMenu();
