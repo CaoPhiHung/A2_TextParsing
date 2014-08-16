@@ -1,14 +1,19 @@
-CC = clang++
-CFLAGS = -Wall #-std=c99 -g -pg
-SOURCES = main.cpp character.cpp node.cpp route.cpp skilltree.cpp
-OBJS = $(patsubst %.c,%.o,$(SOURCES))
-HEADERS = character.h node.h route.h skilltree.h
-	
-main:	$(OBJS)
-	$(CC) $(CFLAGS) -o main $(OBJS) -lcurl
+CXXFLAGS = -Wall -g
 
-$(OBJS): $(HEADERS)
+EXEC = main
+
+OBJS = character.o skilltree.o node.o skills.o
+
+.PHONY: all
+all: $(EXEC)
+
+$(EXEC): $(EXEC).cpp $(OBJS) -lcurl 
+
+skilltree.o: node.h character.h skills.h skilltree.h
+node.o: node.h
+character.o: node.h character.h
+skills.o: node.h skills.h
 
 .PHONY: clean
 clean:
-	rm  main
+	$(RM) *.o *~ core a.out $(EXEC)

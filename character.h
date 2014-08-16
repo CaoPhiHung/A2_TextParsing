@@ -1,5 +1,6 @@
 #ifndef CHARACTER_H
 #define	CHARACTER_H
+#include "node.h"
 
 #include <iostream>
 #include <string>
@@ -7,19 +8,19 @@
 
 using namespace std;
 
-class Character
+class Character : public Node
 {
 	private:
-	int id;
+	char characterID;
+	int nodeID;
     string name;
     int str;
     int dex;
     int intel;
-    vector<long int> connected_nodes;
-
+    vector<int> connectedNodes;
 public:
-    Character(){}
-    virtual ~Character (){}
+    Character();
+    virtual ~Character();
 };
 
 #endif

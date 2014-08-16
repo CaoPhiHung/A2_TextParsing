@@ -11,6 +11,10 @@
 using namespace std;
 using namespace rapidjson;
 
+#include "node.h"
+#include "skills.h"
+#include "character.h"
+
 class SkillTree
 {
 	private:

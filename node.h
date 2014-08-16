@@ -1,28 +1,22 @@
 #ifndef NODE_H
-#define	NODE_H
+#define NODE_H
 
-#include <cstdlib>
-#include <fstream>
-#include <map>
-#include <iomanip>
-#include <sstream>
-#include <map>
-#include <vector>
-#include <algorithm>
-#include <string>
 #include <iostream>
-#include <curl/curl.h>
+#include <string>
+#include <vector>
 
 using namespace std;
 
-class Node {
+class Node
+{
     private:
-        int id;
-        string name;
-        int str;
-        int dex;
-        int intel;
-    public:
+    int nodeID;
+    string name;
+    vector<int> connectedNodes;
+
+public:
+    Node();
+    virtual ~Node();
 };
 
 #endif
