@@ -26,6 +26,7 @@ class SkillTree
 	void executeSkillTree();
 	void connectToWebsite();
 	void readFromTextFile();
+	void executeShortestPath();
 	/* data */
 };
 

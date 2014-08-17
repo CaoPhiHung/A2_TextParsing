@@ -27,7 +27,7 @@ void SkillTree::switchOption(char option)
 	switch(option)
 	{  
 		case shortestPathOption :  
-			cout << "shortestPathOption";
+			executeShortestPath();
 			cout << "\n";
 			break;
 
@@ -86,11 +86,6 @@ void SkillTree::executeSkillTree()
 	}
 
 	assignData();
-	for (int i = 0; i < nodesVector.size(); ++i)
-	{
-		cout << nodesVector.at(i).getSkillsEffect().at(0) << "\n";
-	}
-	
 
 	char userInput;
 	cout << "\n\tWELLCOME TO THE SKILL TREE OPTIMIZATION PROGRAM\n\n";
@@ -197,5 +192,34 @@ void SkillTree::readFromTextFile()
     	getline (myfile,data);
     	myfile.close();
   	}else{ cout << "Unable to open file"; }
+	
+}
+
+void SkillTree::executeShortestPath()
+{
+	/*
+	0 	-	Scion		- node 58833 ( can be) 
+1	-	Marauder	- node 47175
+			2	-	Ranger	- node 50459
+			3 	-	Witch		- node 54447
+			4 	-	Duelist	- node 50986
+			5	-	Templar	- node 61525
+			6	-	Shadow	- node 44683
+	*/
+	int charID;		
+	cout << "\n\tChoose your character\n";
+	cout << "\t1 -  Marauder\n";
+	cout << "\t2 -  Ranger\n";
+	cout << "\t3 -  Witch\n";
+	cout << "\t4 -  Duelist\n";
+	cout << "\t5 -  Templar\n";
+	cout << "\t6 -  Shadow\n";
+	cout << "\t0 -  Scion\n";
+	cout << "> Enter your choice: ";
+	cin >> charID;
+	int characterID[7] = {58833,47175,50459,54447,50986,61525,44683};
+	int startPosition = characterID[charID];
+	int endPosition = 26523;
+	// 47175 -> 31628 -> 9511 -> 23881 -> 26523
 	
 }

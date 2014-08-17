@@ -14,7 +14,7 @@ class Node
     string name;
     vector<string> skillsEffect;
     vector<int> connectedNodes;
-
+   
 	public:
 	//Node();
     //virtual ~Node();
