@@ -27,6 +27,14 @@ class SkillTree
 	void connectToWebsite();
 	void readFromTextFile();
 	void executeShortestPath();
+	void read(std::vector<Node>, int);
+	void initialize();
+	int getClosestUnmarkedNode();
+	void calculateDistance();
+	void output();
+    void printPath(int);
+    int getNodeIDFromIndex(int);
+    int getIndexFromNodeID(int);
 	/* data */
 };
 
