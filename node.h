@@ -23,6 +23,7 @@ class Node
     string getName();
     vector<string> getSkillsEffect();
     vector<int> getConnectedNodes();
+    void toString();
 
 };
 

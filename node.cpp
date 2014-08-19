@@ -27,3 +27,13 @@ vector<int> Node::getConnectedNodes()
 {
 	return connectedNodes;
 }
+
+void Node::toString(){
+	cout << "Node ID " << nodeID << endl;
+	if (skillsEffect.size() == 0) return;
+	for (unsigned int i = 0; i < skillsEffect.size(); ++i)
+	{
+		cout << skillsEffect.at(i) << endl;
+	}
+	cout << "--------------------" << endl;
+}
