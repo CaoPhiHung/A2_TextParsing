@@ -36,6 +36,7 @@ class SkillTree
     int getNodeIDFromIndex(int);
     int getIndexFromNodeID(int);
     void optimizeStrategy(int);
+    int chooseCharacterMenu();
 
 
 	/* data */

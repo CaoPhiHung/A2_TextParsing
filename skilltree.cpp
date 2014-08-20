@@ -1,5 +1,7 @@
 #include "skilltree.h"
-#define INFINITY 999
+#include <fstream>
+
+
 const char maximizeIntelligenceOption = 'I';
 const char maximizeDeterityOption = 'D';
 const char maximizeStrengthOption = 'S';
@@ -8,13 +10,15 @@ const char shortestPathOption = 'P';
 const char quitOption = 'Q';
 
 vector<Node> nodesVector;
-//asdasd
+
+
 int adjMatrix[1515][1515];
 int predecessor[1515],distanceAray[1515];
 bool mark[1515]; //keep track of visited node
 int source;
 int numOfVertices;
 int endPosition;
+#define INFINITY 999
 
 //checking the user input 
 char SkillTree::checkInput()
@@ -39,7 +43,6 @@ void SkillTree::switchOption(char option)
 			break;
 
 		case maximizeIntelligenceOption :  
-			cout << "Intelligence";
 			optimizeStrategy(1);
 			cout << "\n";
 			break;
@@ -202,7 +205,7 @@ void SkillTree::readFromTextFile()
 	
 }
 
-void SkillTree::executeShortestPath()
+int SkillTree::chooseCharacterMenu()
 {
 	/*
 	0 	-	Scion		- node 58833 ( can be) 
@@ -227,23 +230,30 @@ void SkillTree::executeShortestPath()
 	cin >> charID;
 	int characterID[7] = {58833,47175,50459,54447,50986,61525,44683};
 	int startPosition = characterID[charID];
-	
+	return startPosition;
+}
+
+void SkillTree::executeShortestPath()
+{
+	int start =  chooseCharacterMenu();	
 	cout << "\tEnter destination ID: ";
 	cout << "\n> \t";
 	int endP;
 	cin >> endP;
 	// 47175 -> 31628 -> 9511 -> 23881 -> 26523
 	cout << "\n\t Shortest Path: \n";
-	findShortestPath(nodesVector,startPosition,endP);
-
+	findShortestPath(nodesVector,start,endP);
+	//read();
 }
 
 void SkillTree::findShortestPath(vector<Node> v, int start,int end){
 	//source = getIndexFromNodeID(start);
-	//cout << "Start Index: " << source << "\n";
+	
 	endPosition = end;
 	numOfVertices = v.size();
 	source = getIndexFromNodeID(start);
+	cout << "Start Index: " << source << "\n";
+	cout << "End Index: " << getIndexFromNodeID(endPosition) << "\n";
 	/* Initilize 2d array */
 	for (unsigned int i = 0; i < v.size(); ++i)
 	{
@@ -253,12 +263,10 @@ void SkillTree::findShortestPath(vector<Node> v, int start,int end){
 		}
 	}
 
-	//cout << "Read fron vector " << v.size() << endl;
+	//cout << "Read from vector " << v.size() << endl;
 	for (unsigned int i = 0; i <  v.size() ; i++){
 		Node currNode = v.at(i);
 		std::vector<int> connectedNodes = currNode.getConnectedNodes();
-
-		adjMatrix[i][i] = 0;
 
 		for (unsigned int j = 0; j < connectedNodes.size(); ++j)
 		{
@@ -266,24 +274,29 @@ void SkillTree::findShortestPath(vector<Node> v, int start,int end){
 			int indexI = getIndexFromNodeID(currNode.getNodeID());
 			int indexJ = getIndexFromNodeID(connectedNodes.at(j));
 
+			if (indexI == indexJ){
+				adjMatrix[indexI][indexJ] = 0;	
+			}
 			adjMatrix[indexI][indexJ] = 1;
+			adjMatrix[indexJ][indexI] = 1;
 
 		}
 
 		
 	}
-	/*
-	for (int i = 0; i < 5; ++i)
-    {
-    	for (int j = 0; j < 5; ++j)
-    	{
-    		cout << getNodeIDFromIndex(i) << " - " << getNodeIDFromIndex(j) << endl;
-    		cout << adjMatrix[i][j] << endl;
+
+	
+	// for (int i = 0; i < 5; ++i)
+ //    {
+ //    	for (int j = 0; j < 5; ++j)
+ //    	{
+ //    		cout << getNodeIDFromIndex(i) << " - " << getNodeIDFromIndex(j) << endl;
+ //    		cout << adjMatrix[i][j] << endl;
     		
-    	}
-    	cout << endl;
-    }
-	*/
+ //    	}
+ //    	cout << endl;
+ //    }
+
 
     calculateDistance();
 	output();
@@ -304,7 +317,7 @@ int SkillTree::getIndexFromNodeID(int nodeID){
 int SkillTree::getNodeIDFromIndex(int index){
 	return nodesVector.at(index).getNodeID();
 }
- 
+
 void SkillTree::initialize(){
     for(int i=0;i<numOfVertices;i++) {
         mark[i] = false;
@@ -318,12 +331,22 @@ void SkillTree::initialize(){
 int SkillTree::getClosestUnmarkedNode(){
     int minDistance = INFINITY;
     int closestUnmarkedNode;
-    for(int i=0;i<numOfVertices;i++) {
+
+    for(int i=0; i < numOfVertices; i++) {
         if((!mark[i]) && ( minDistance >= distanceAray[i])) {
             minDistance = distanceAray[i];
             closestUnmarkedNode = i;
         }
     }
+    /*
+    
+        for(int i = numOfVertices; i > 0; i--) {
+        if((!mark[i]) && ( minDistance >= distanceAray[i])) {
+            minDistance = distanceAray[i];
+            closestUnmarkedNode = i;
+        }
+    }
+    */
     return closestUnmarkedNode;
 }
  
@@ -336,11 +359,15 @@ void SkillTree::calculateDistance(){
     while(count < numOfVertices) {
         closestUnmarkedNode = getClosestUnmarkedNode();
         mark[closestUnmarkedNode] = true;
-        for(int i=0;i<numOfVertices;i++) {
-            if((!mark[i]) && (adjMatrix[closestUnmarkedNode][i]>0) ) {
-                if(distanceAray[i] > distanceAray[closestUnmarkedNode]+adjMatrix[closestUnmarkedNode][i]) {
-                    distanceAray[i] = distanceAray[closestUnmarkedNode]+adjMatrix[closestUnmarkedNode][i];
+        for(int i=0;i< numOfVertices;i++) {
+            if((!mark[i]) && (adjMatrix[closestUnmarkedNode][i] > 0 ) ) {
+                if(distanceAray[i] > distanceAray[closestUnmarkedNode]+ adjMatrix[closestUnmarkedNode][i]) {
+                    distanceAray[i] = distanceAray[closestUnmarkedNode]+ adjMatrix[closestUnmarkedNode][i];
                     predecessor[i] = closestUnmarkedNode;
+                }else{
+                	// cout << "closestUnmarkedNode " << getNodeIDFromIndex(closestUnmarkedNode) << endl;
+                	// cout << "Distance " << adjMatrix[closestUnmarkedNode][i] << endl;
+                	// cout << "------------" << endl;
                 }
             }
         }
@@ -354,8 +381,10 @@ void SkillTree::printPath(int desIndex){
 
     if(desIndex == source)
         cout<< getNodeIDFromIndex(desIndex) <<"..";
-    else if(predecessor[desIndex] == -1)
-        cout<<"No path from “<<source<<”to "<< getNodeIDFromIndex(desIndex) <<endl;
+    else if(predecessor[desIndex] == -1){
+    	cout << "Node with no predecessor" << getNodeIDFromIndex(desIndex) << endl;
+        cout<<"No path from "<< getNodeIDFromIndex(source) << " to "<< getNodeIDFromIndex(desIndex) <<endl;
+    }
     else {
         printPath(predecessor[desIndex]);
         cout<< getNodeIDFromIndex(desIndex) <<"..";
@@ -366,14 +395,13 @@ void SkillTree::printPath(int desIndex){
 void SkillTree::output(){
 
     int desIndex = getIndexFromNodeID(endPosition);
-   
-    //cout << "DesIndex " << desIndex << endl;
     printPath(desIndex);
     cout<<"->"<<distanceAray[desIndex]<<endl;
 }
 
 void SkillTree::optimizeStrategy(int type){
-	std::vector<char> v;
+	int start = chooseCharacterMenu();
+	std::vector<int> v;
 	for (unsigned int i = 0; i < nodesVector.size(); ++i)
 	{
 		Node currNode = nodesVector.at(i);
@@ -385,11 +413,20 @@ void SkillTree::optimizeStrategy(int type){
 			
 			string e = effects.at(j);
 			if (e.find("Intelligence") != string::npos){
+				//cout << "Node ID: " << currNode.getNodeID() << "\n";
+				//cout << "Effect: " << effects.at(j) << "\n";
+				//cout << "---------------" << "\n";
+				v.push_back(currNode.getNodeID());
 			}
 
 		}
-		
-
-
 	}
+
+	cout <<"Size: " << v.size()<<"\n";
+	for (unsigned int i = 0; i < v.size(); ++i)
+	{
+		findShortestPath(nodesVector,start, v.at(i));
+		cout << "\n";
+	}
+
 }
