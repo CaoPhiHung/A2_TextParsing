@@ -31,12 +31,13 @@ class SkillTree
 	void initialize();
 	int getClosestUnmarkedNode();
 	void calculateDistance();
-	void output();
-    void printPath(int);
+	string output();
+    string printPath(int);
     int getNodeIDFromIndex(int);
     int getIndexFromNodeID(int);
     void optimizeStrategy(int);
     int chooseCharacterMenu();
+    void create2dArrayForBigMap(vector<Node>);
 
 
 	/* data */

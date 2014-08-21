@@ -1,5 +1,7 @@
 #include "skilltree.h"
 #include <fstream>
+#include <sstream>
+#include <iomanip>
 
 
 const char maximizeIntelligenceOption = 'I';
@@ -12,9 +14,10 @@ const char quitOption = 'Q';
 vector<Node> nodesVector;
 
 
-int adjMatrix[1515][1515];
-int predecessor[1515],distanceAray[1515];
-bool mark[1515]; //keep track of visited node
+int** adjMatrix;
+int* predecessor;
+int* distanceAray;
+bool* mark; //keep track of visited node
 int source;
 int numOfVertices;
 int endPosition;
@@ -48,12 +51,12 @@ void SkillTree::switchOption(char option)
 			break;
 
 		case maximizeDeterityOption :  
-			cout << "Deterity";
+			optimizeStrategy(2);
 			cout << "\n";
 			break;
 
 		case maximizeStrengthOption :  
-			cout << "Strength";
+			optimizeStrategy(3);
 			cout << "\n";
 			break;
 
@@ -77,7 +80,7 @@ void SkillTree::printMenu()
 	cout << "\t\t---------------SKILL TREE OPTIMIZATION---------------\n";
 	cout << "\tOption p:	Shortest path\n";
 	cout << "\tOption i: 	Maximize Intelligence\n";
-	cout << "\tOption d: 	Maximize Deterity\n";
+	cout << "\tOption d: 	Maximize Dexterity\n";
 	cout << "\tOption s: 	Maximize Strength\n";
 	cout << "\tOption m:	Show menu\n";
 	cout << "\tOption q:	Quit the program\n\n";
@@ -97,6 +100,7 @@ void SkillTree::executeSkillTree()
 	}
 
 	assignData();
+	create2dArrayForBigMap(nodesVector);
 
 	char userInput;
 	cout << "\n\tWELLCOME TO THE SKILL TREE OPTIMIZATION PROGRAM\n\n";
@@ -245,6 +249,49 @@ void SkillTree::executeShortestPath()
 	findShortestPath(nodesVector,start,endP);
 	//read();
 }
+void SkillTree::create2dArrayForBigMap(vector<Node> v)
+{
+	int size = v.size();
+	
+	adjMatrix = new int*[size];
+	predecessor = new int [size];
+	distanceAray = new int [size];
+	mark = new bool [size]; 
+
+	for (int i = 0; i < size; ++i)
+	{
+		adjMatrix[i] = new int[size];
+	}
+
+		/* Initilize 2d array */
+	for (unsigned int i = 0; i < v.size(); ++i)
+	{
+		for (unsigned int j = 0; j < v.size(); ++j)
+		{
+			adjMatrix[i][j] = INFINITY;
+		}
+	}
+
+	//cout << "Read from vector " << v.size() << endl;
+	for (unsigned int i = 0; i <  v.size() ; i++){
+		Node currNode = v.at(i);
+		std::vector<int> connectedNodes = currNode.getConnectedNodes();
+
+		for (unsigned int j = 0; j < connectedNodes.size(); ++j)
+		{
+			// cout << "\t" << connectedNodes.at(j) << endl; 
+			int indexI = getIndexFromNodeID(currNode.getNodeID());
+			int indexJ = getIndexFromNodeID(connectedNodes.at(j));
+
+			if (indexI == indexJ){
+				adjMatrix[indexI][indexJ] = 0;	
+			}
+			adjMatrix[indexI][indexJ] = 1;
+			adjMatrix[indexJ][indexI] = 1;
+
+		}
+	}
+}
 
 void SkillTree::findShortestPath(vector<Node> v, int start,int end){
 	//source = getIndexFromNodeID(start);
@@ -252,9 +299,12 @@ void SkillTree::findShortestPath(vector<Node> v, int start,int end){
 	endPosition = end;
 	numOfVertices = v.size();
 	source = getIndexFromNodeID(start);
-	cout << "Start Index: " << source << "\n";
-	cout << "End Index: " << getIndexFromNodeID(endPosition) << "\n";
+	//cout << "Start Index: " << source << "\n";
+	//cout << "End Index: " << getIndexFromNodeID(endPosition) << "\n";
+	
+
 	/* Initilize 2d array */
+	/*
 	for (unsigned int i = 0; i < v.size(); ++i)
 	{
 		for (unsigned int j = 0; j < v.size(); ++j)
@@ -284,6 +334,7 @@ void SkillTree::findShortestPath(vector<Node> v, int start,int end){
 
 		
 	}
+	*/
 
 	
 	// for (int i = 0; i < 5; ++i)
@@ -299,7 +350,7 @@ void SkillTree::findShortestPath(vector<Node> v, int start,int end){
 
 
     calculateDistance();
-	output();
+	cout << output();
 }
 
 
@@ -377,56 +428,115 @@ void SkillTree::calculateDistance(){
 }
  
  
-void SkillTree::printPath(int desIndex){
+string SkillTree::printPath(int desIndex){
+
+	ostringstream ost;
 
     if(desIndex == source)
-        cout<< getNodeIDFromIndex(desIndex) <<"..";
+    	ost << getNodeIDFromIndex(desIndex) <<"..";
+        //cout<< getNodeIDFromIndex(desIndex) <<"..";
     else if(predecessor[desIndex] == -1){
-    	cout << "Node with no predecessor" << getNodeIDFromIndex(desIndex) << endl;
-        cout<<"No path from "<< getNodeIDFromIndex(source) << " to "<< getNodeIDFromIndex(desIndex) <<endl;
+    	ost << "Node with no predecessor" << getNodeIDFromIndex(desIndex) << endl;
+        ost<<"No path from "<< getNodeIDFromIndex(source) << " to "<< getNodeIDFromIndex(desIndex) <<endl;
     }
     else {
-        printPath(predecessor[desIndex]);
-        cout<< getNodeIDFromIndex(desIndex) <<"..";
+        ost << printPath(predecessor[desIndex]);
+        ost << getNodeIDFromIndex(desIndex) <<"..";
     }
+    string s = ost.str();
+    return s;
 }
  
  
-void SkillTree::output(){
+string SkillTree::output(){
 
     int desIndex = getIndexFromNodeID(endPosition);
-    printPath(desIndex);
-    cout<<"->"<<distanceAray[desIndex]<<endl;
+    //printPath(desIndex);
+    //cout<<"->"<<distanceAray[desIndex]<<endl;
+    ostringstream ost;
+	ost << printPath(desIndex) << "\n";
+	string s = ost.str();
+    return s;
 }
 
 void SkillTree::optimizeStrategy(int type){
 	int start = chooseCharacterMenu();
+
 	std::vector<int> v;
-	for (unsigned int i = 0; i < nodesVector.size(); ++i)
+	if (type == 1)
 	{
-		Node currNode = nodesVector.at(i);
-		std::vector<string> effects = currNode.getSkillsEffect();
-		
-
-		for (unsigned int j = 0; j < effects.size(); ++j)
+		cout << "\n\tOptimization max Intelligence\n";
+		for (unsigned int i = 0; i < nodesVector.size(); ++i)
 		{
+			Node currNode = nodesVector.at(i);
+			std::vector<string> effects = currNode.getSkillsEffect();
 			
-			string e = effects.at(j);
-			if (e.find("Intelligence") != string::npos){
-				//cout << "Node ID: " << currNode.getNodeID() << "\n";
-				//cout << "Effect: " << effects.at(j) << "\n";
-				//cout << "---------------" << "\n";
-				v.push_back(currNode.getNodeID());
+
+			for (unsigned int j = 0; j < effects.size(); ++j)
+			{
+				
+				string e = effects.at(j);
+				if (e.find("to Intelligence") != string::npos){
+					cout << "Node ID: " << currNode.getNodeID() << "\n";
+					cout << "Effect: " << effects.at(j) << "\n";
+					cout << "---------------" << "\n";
+					v.push_back(currNode.getNodeID());
+				}
+
 			}
-
 		}
-	}
+	}else if(type == 2){
+		cout << "\n\tOptimization max Dexterity\n";
+		for (unsigned int i = 0; i < nodesVector.size(); ++i)
+		{
+			Node currNode = nodesVector.at(i);
+			std::vector<string> effects = currNode.getSkillsEffect();
+			
 
-	cout <<"Size: " << v.size()<<"\n";
-	for (unsigned int i = 0; i < v.size(); ++i)
+			for (unsigned int j = 0; j < effects.size(); ++j)
+			{
+				
+				string e = effects.at(j);
+				if (e.find("to Dexterity") != string::npos){
+					cout << "Node ID: " << currNode.getNodeID() << "\n";
+					cout << "Effect: " << effects.at(j) << "\n";
+					cout << "---------------" << "\n";
+					v.push_back(currNode.getNodeID());
+				}
+
+			}
+		}		
+	}else{
+		cout << "\n\tOptimization max Strength\n";
+		for (unsigned int i = 0; i < nodesVector.size(); ++i)
+		{
+			Node currNode = nodesVector.at(i);
+			std::vector<string> effects = currNode.getSkillsEffect();
+			
+
+			for (unsigned int j = 0; j < effects.size(); ++j)
+			{
+				
+				string e = effects.at(j);
+				if (e.find("to Strength") != string::npos){
+					cout << "Node ID: " << currNode.getNodeID() << "\n";
+					cout << "Effect: " << effects.at(j) << "\n";
+					cout << "---------------" << "\n";
+					v.push_back(currNode.getNodeID());
+				}
+
+			}
+		}			
+	}
+	
+	cout << "\n";
+	findShortestPath(nodesVector,start, v.at(0));
+	cout << "";
+	for (unsigned int i = 0; i < v.size() - 1; i++)
 	{
-		findShortestPath(nodesVector,start, v.at(i));
-		cout << "\n";
-	}
+		int nextNode = i + 1;
+		findShortestPath(nodesVector,v.at(i), v.at(nextNode));
 
+	}
+	
 }
