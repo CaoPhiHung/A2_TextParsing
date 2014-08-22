@@ -10,6 +10,8 @@ const char maximizeStrengthOption = 'S';
 const char printMenuOption = 'M';
 const char shortestPathOption = 'P';
 const char quitOption = 'Q';
+const char saveOption = 'C';
+const char loadOption = 'L';
 
 vector<Node> nodesVector;
 
@@ -21,6 +23,8 @@ bool* mark; //keep track of visited node
 int source;
 int numOfVertices;
 int endPosition;
+string path="";
+
 #define INFINITY 999
 
 //checking the user input 
@@ -65,6 +69,16 @@ void SkillTree::switchOption(char option)
 			cout << "\n";
 			break;
 
+		case saveOption:  
+			savePath();
+			cout << "\n";
+			break;
+
+		case loadOption:  
+			loadPath();
+			cout << "\n";
+			break;
+
 		case quitOption:  
 			cout << "\tThe Skill Tree Optimization Program is shutting down\n\n";
 			break;
@@ -83,6 +97,8 @@ void SkillTree::printMenu()
 	cout << "\tOption d: 	Maximize Dexterity\n";
 	cout << "\tOption s: 	Maximize Strength\n";
 	cout << "\tOption m:	Show menu\n";
+	cout << "\tOption c:	Save Path\n";
+	cout << "\tOption l:	Load Path\n";
 	cout << "\tOption q:	Quit the program\n\n";
 	cout << "\tEnter your option: ";
 }
@@ -246,7 +262,8 @@ void SkillTree::executeShortestPath()
 	cin >> endP;
 	// 47175 -> 31628 -> 9511 -> 23881 -> 26523
 	cout << "\n\t Shortest Path: \n";
-	findShortestPath(nodesVector,start,endP);
+	path =	findShortestPath(nodesVector,start,endP);
+	cout << path;
 	//read();
 }
 void SkillTree::create2dArrayForBigMap(vector<Node> v)
@@ -293,7 +310,7 @@ void SkillTree::create2dArrayForBigMap(vector<Node> v)
 	}
 }
 
-void SkillTree::findShortestPath(vector<Node> v, int start,int end){
+string SkillTree::findShortestPath(vector<Node> v, int start,int end){
 	//source = getIndexFromNodeID(start);
 	
 	endPosition = end;
@@ -350,7 +367,7 @@ void SkillTree::findShortestPath(vector<Node> v, int start,int end){
 
 
     calculateDistance();
-	cout << output();
+	return output();
 }
 
 
@@ -390,7 +407,6 @@ int SkillTree::getClosestUnmarkedNode(){
         }
     }
     /*
-    
         for(int i = numOfVertices; i > 0; i--) {
         if((!mark[i]) && ( minDistance >= distanceAray[i])) {
             minDistance = distanceAray[i];
@@ -457,6 +473,30 @@ string SkillTree::output(){
 	ost << printPath(desIndex) << "\n";
 	string s = ost.str();
     return s;
+}
+
+void SkillTree::savePath()
+{
+	//write to file
+
+	ofstream myfile;
+	myfile.open ("path.txt");
+	myfile << path;
+	myfile.close();
+	cout << "Current Path has been saved!"<<"\n";
+
+}
+
+void SkillTree::loadPath()
+{
+	//read from file => add to data
+	ifstream myfile ("path.txt");
+  	if (myfile.is_open())
+  	{
+    	getline (myfile,path);
+    	myfile.close();
+  	}else{ cout << "Unable to open file"; }
+  	cout << "Old Path: " << path <<"\n";
 }
 
 void SkillTree::optimizeStrategy(int type){
@@ -530,12 +570,14 @@ void SkillTree::optimizeStrategy(int type){
 	}
 	
 	cout << "\n";
-	findShortestPath(nodesVector,start, v.at(0));
+	path = findShortestPath(nodesVector,start, v.at(0));
+	cout << path;
 	cout << "";
 	for (unsigned int i = 0; i < v.size() - 1; i++)
 	{
 		int nextNode = i + 1;
-		findShortestPath(nodesVector,v.at(i), v.at(nextNode));
+		path += findShortestPath(nodesVector,v.at(i), v.at(nextNode));
+		cout << path;
 
 	}
 	

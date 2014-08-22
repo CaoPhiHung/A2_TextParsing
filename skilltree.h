@@ -27,7 +27,7 @@ class SkillTree
 	void connectToWebsite();
 	void readFromTextFile();
 	void executeShortestPath();
-	void findShortestPath(std::vector<Node>, int,int);
+	string findShortestPath(std::vector<Node>, int,int);
 	void initialize();
 	int getClosestUnmarkedNode();
 	void calculateDistance();
@@ -38,6 +38,8 @@ class SkillTree
     void optimizeStrategy(int);
     int chooseCharacterMenu();
     void create2dArrayForBigMap(vector<Node>);
+    void savePath();
+    void loadPath();
 
 
 	/* data */
