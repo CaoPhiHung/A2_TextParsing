@@ -40,7 +40,8 @@ class SkillTree
     void create2dArrayForBigMap(vector<Node>);
     void savePath();
     void loadPath();
-
+    int refund(int);
+    bool checkNodeId(int);
 
 	/* data */
 };

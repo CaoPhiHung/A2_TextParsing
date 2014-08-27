@@ -12,6 +12,7 @@ const char shortestPathOption = 'P';
 const char quitOption = 'Q';
 const char saveOption = 'C';
 const char loadOption = 'L';
+const char refundOption = 'R';
 
 vector<Node> nodesVector;
 
@@ -19,11 +20,12 @@ vector<Node> nodesVector;
 int** adjMatrix;
 int* predecessor;
 int* distanceAray;
-bool* mark; //keep track of visited node
+bool* mark;
 int source;
 int numOfVertices;
 int endPosition;
 string path="";
+int totalRefundPoint;
 
 #define INFINITY 999
 
@@ -79,6 +81,17 @@ void SkillTree::switchOption(char option)
 			cout << "\n";
 			break;
 
+		case refundOption:  
+			cout << "\tEnter total point: ";
+			//cin >> totalRefundPoint;
+			while(!(cin >> totalRefundPoint) || totalRefundPoint < 0){
+				cout << "\tWrong input!! Enter total point: ";
+				cin.clear();
+    			cin.ignore(INT_MAX, '\n');
+			}
+			cout << "\tTotal Point : " << totalRefundPoint << "\n\n";
+			break;
+
 		case quitOption:  
 			cout << "\tThe Skill Tree Optimization Program is shutting down\n\n";
 			break;
@@ -92,6 +105,7 @@ void SkillTree::switchOption(char option)
 void SkillTree::printMenu()
 {
 	cout << "\t\t---------------SKILL TREE OPTIMIZATION---------------\n";
+	cout << "\tOption r:	Total of Point\n";
 	cout << "\tOption p:	Shortest path\n";
 	cout << "\tOption i: 	Maximize Intelligence\n";
 	cout << "\tOption d: 	Maximize Dexterity\n";
@@ -247,8 +261,17 @@ int SkillTree::chooseCharacterMenu()
 	cout << "\t0 -  Scion\n";
 	cout << "\tEnter your choice: ";
 	cout << "\n> \t";
-	cin >> charID;
+	//cin >> charID;
 	int characterID[7] = {58833,47175,50459,54447,50986,61525,44683};
+
+	while(!(cin >> charID) || charID > 6 || charID < 0)
+	{
+		cout << "Wrong Input!! Please choose from 0 - 6: \n\t";
+		cin.clear();
+    	cin.ignore(INT_MAX, '\n');
+		//cin >> charID;
+	}
+
 	int startPosition = characterID[charID];
 	return startPosition;
 }
@@ -259,7 +282,24 @@ void SkillTree::executeShortestPath()
 	cout << "\tEnter destination ID: ";
 	cout << "\n> \t";
 	int endP;
-	cin >> endP;
+	//cin >> endP;
+	while(!(cin >> endP))
+	{
+		cout<< "\tWrong node ID!Please enter another node: \n\t";
+		cin.clear();
+    	cin.ignore(INT_MAX, '\n');		
+	}
+
+	bool check = checkNodeId(endP);
+	while(check == false)
+	{
+		cout<< "\tWrong node ID!Please enter another node: \n\t";
+		cin >> endP;
+		cin.clear();
+    	cin.ignore(INT_MAX, '\n');
+		check = checkNodeId(endP);
+	}
+
 	// 47175 -> 31628 -> 9511 -> 23881 -> 26523
 	cout << "\n\t Shortest Path: \n";
 	path =	findShortestPath(nodesVector,start,endP);
@@ -468,9 +508,15 @@ string SkillTree::output(){
 
     int desIndex = getIndexFromNodeID(endPosition);
     //printPath(desIndex);
-    //cout<<"->"<<distanceAray[desIndex]<<endl;
+    
     ostringstream ost;
-	ost << printPath(desIndex) << "\n";
+	ost << printPath(desIndex);
+	ost<<"->"<<distanceAray[desIndex]<<endl;
+	int refundPoint = refund(distanceAray[desIndex]);
+	
+	if (refundPoint >= 0)
+		ost << "Point Left:" << refundPoint << endl;
+	
 	string s = ost.str();
     return s;
 }
@@ -503,6 +549,7 @@ void SkillTree::optimizeStrategy(int type){
 	int start = chooseCharacterMenu();
 
 	std::vector<int> v;
+	int totalPassiveAttr = 0;
 	if (type == 1)
 	{
 		cout << "\n\tOptimization max Intelligence\n";
@@ -517,9 +564,7 @@ void SkillTree::optimizeStrategy(int type){
 				
 				string e = effects.at(j);
 				if (e.find("to Intelligence") != string::npos){
-					cout << "Node ID: " << currNode.getNodeID() << "\n";
-					cout << "Effect: " << effects.at(j) << "\n";
-					cout << "---------------" << "\n";
+					totalPassiveAttr += atoi(e.substr(1,2).c_str()); 
 					v.push_back(currNode.getNodeID());
 				}
 
@@ -538,9 +583,7 @@ void SkillTree::optimizeStrategy(int type){
 				
 				string e = effects.at(j);
 				if (e.find("to Dexterity") != string::npos){
-					cout << "Node ID: " << currNode.getNodeID() << "\n";
-					cout << "Effect: " << effects.at(j) << "\n";
-					cout << "---------------" << "\n";
+					totalPassiveAttr += atoi(e.substr(1,2).c_str()); 
 					v.push_back(currNode.getNodeID());
 				}
 
@@ -559,9 +602,7 @@ void SkillTree::optimizeStrategy(int type){
 				
 				string e = effects.at(j);
 				if (e.find("to Strength") != string::npos){
-					cout << "Node ID: " << currNode.getNodeID() << "\n";
-					cout << "Effect: " << effects.at(j) << "\n";
-					cout << "---------------" << "\n";
+					totalPassiveAttr += atoi(e.substr(1,2).c_str()); 
 					v.push_back(currNode.getNodeID());
 				}
 
@@ -580,5 +621,24 @@ void SkillTree::optimizeStrategy(int type){
 		cout << path;
 
 	}
-	
+
+	cout << "Total passive attribute: +" << totalPassiveAttr << endl;  
 }
+
+int SkillTree::refund(int usedPoint){
+
+	totalRefundPoint -= usedPoint;
+	return totalRefundPoint;
+}
+
+bool SkillTree::checkNodeId(int node)
+{
+	for (unsigned int i = 0; i < nodesVector.size(); ++i)
+	{
+		if (node == nodesVector.at(i).getNodeID())
+		{
+			return true;
+		}
+	}
+	return false;
+}	
